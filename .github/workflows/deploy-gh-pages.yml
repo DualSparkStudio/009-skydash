@@ -36,7 +36,9 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./template
-        run: npm ci
+        run: |
+          rm -f package-lock.json
+          npm install
 
       - name: Build CSS
         working-directory: ./template

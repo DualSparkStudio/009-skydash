@@ -126,6 +126,29 @@ gulp.task('replacePath', function(){
     return merge(replacePath1 , replacePath2, replacePath3);
 });
 
+/*Fix paths for GitHub Pages deployment - ROOT FIX*/
+gulp.task('fixGitHubPages', function() {
+    // Get repository name from environment variable or use default
+    var repoName = process.env.GITHUB_REPOSITORY ? 
+        process.env.GITHUB_REPOSITORY.split('/')[1] : 
+        '009-skydash';
+    var basePath = '/' + repoName + '/template/';
+    
+    console.log('Fixing paths for GitHub Pages with base: ' + basePath);
+    
+    // Fix all HTML files
+    return gulp.src(['./**/*.html'], { base: "./" })
+        // Fix href attributes for resources
+        .pipe(replace(/href="(vendors|css|js|images|pages|fonts)\//g, 'href="' + basePath + '$1/'))
+        // Fix src attributes for resources
+        .pipe(replace(/src="(vendors|css|js|images|pages|fonts)\//g, 'src="' + basePath + '$1/'))
+        // Fix index.html links
+        .pipe(replace(/href="index\.html"/g, 'href="' + basePath + 'index.html"'))
+        // Add base tag if not present
+        .pipe(replace(/<head>/, '<head>\n  <base href="' + basePath + '">'))
+        .pipe(gulp.dest('.'));
+});
+
 /*sequence for injecting partials and replacing paths*/
 gulp.task('inject', gulp.series('injectPartial' , 'injectCommonAssets' , 'injectLayoutStyles', 'replacePath'));
 

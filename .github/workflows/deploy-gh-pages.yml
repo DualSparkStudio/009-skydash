@@ -48,7 +48,10 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           npm install -g gulp-cli
+          echo "Repository: $GITHUB_REPOSITORY"
           npx gulp fixGitHubPages
+          echo "Verifying base tag was added..."
+          grep -r "base href" index.html || echo "WARNING: Base tag not found!"
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

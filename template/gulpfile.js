@@ -133,19 +133,17 @@ gulp.task('fixGitHubPages', function() {
     var repoName = process.env.GITHUB_REPOSITORY ? 
         process.env.GITHUB_REPOSITORY.split('/')[1] : 
         '009-skydash';
-    var basePath = '/' + repoName + '/template/';
+    // Since we're deploying the /template folder as the root, base path is just /repo-name/
+    var basePath = '/' + repoName + '/';
     
     console.log('Fixing paths for GitHub Pages with base: ' + basePath);
+    console.log('Repository: ' + (process.env.GITHUB_REPOSITORY || 'not set'));
     
     // Fix all HTML files
     return gulp.src(['./**/*.html'], { base: "./" })
-        // Fix href attributes for resources
-        .pipe(replace(/href="(vendors|css|js|images|pages|fonts)\//g, 'href="' + basePath + '$1/'))
-        // Fix src attributes for resources
-        .pipe(replace(/src="(vendors|css|js|images|pages|fonts)\//g, 'src="' + basePath + '$1/'))
-        // Fix index.html links
-        .pipe(replace(/href="index\.html"/g, 'href="' + basePath + 'index.html"'))
-        // Add base tag if not present
+        // Remove existing base tags first
+        .pipe(replace(/<base[^>]*>/gi, ''))
+        // Add base tag right after <head>
         .pipe(replace(/<head>/, '<head>\n  <base href="' + basePath + '">'))
         .pipe(gulp.dest('.'));
 });
